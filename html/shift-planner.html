@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Planner</title>
+<link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+<div class="wrap">
+  <div class="masthead">
+    <div class="masthead-left">
+      <a href="index.html" class="back-btn" title="Back to home">←</a>
+        <h1>Shift Planner</h1>
+        <div style="display:flex;align-items:center;gap:8px;margin-left:20px;">
+        <select id="jobSelector" aria-label="Select job"></select>
+        <button class="gear-btn" id="openJobManager" aria-label="Manage jobs" title="Add/edit/delete jobs">+</button>
+      </div>
+    </div>
+    <div style="display:flex;align-items:center;gap:12px;">
+      <span id="today"></span>
+      <button class="gear-btn" id="openSettings" aria-label="Open settings">⚙</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="toast-bubble" id="toastBubble">Shift added successfully! ✨</div>
+
+    <div class="field">
+      <label class="section-label">Date Range</label>
+      <button class="date-picker-btn" id="datePickerBtn" type="button">
+        <span id="selectedDateLabel">—</span>
+        <span class="date-chevron">⌄</span>
+      </button>
+      <div class="date-picker" id="datePicker">
+        <div class="date-picker-header">
+          <button type="button" id="datePrev">‹</button>
+          <strong id="datePickerMonth">—</strong>
+          <button type="button" id="dateNext">›</button>
+        </div>
+        <div class="date-picker-weekdays">
+          <span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span>
+        </div>
+        <div class="date-picker-grid" id="datePickerGrid"></div>
+      </div>
+    </div>
+
+    <!-- Templates Bar with Inline Adder -->
+    <div class="field" style="margin-bottom:10px;">
+      <label class="section-label">Templates</label>
+      <div class="templates-bar" id="templatesBar">
+        <button type="button" class="add-template-trigger" id="addTplToggle" title="Add new template">+</button>
+      </div>
+      <div class="add-template-form" id="addTplForm">
+        <input type="text" id="newTplName" placeholder="Template name">
+        <input type="time" id="newTplStart" value="09:00">
+        <input type="time" id="newTplEnd" value="17:00">
+        <button type="button" class="add-tpl-action-btn" id="addTplBtn">Save template</button>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="field">
+        <label class="section-label" for="start">Start</label>
+        <input type="time" id="start" value="08:00">
+      </div>
+      <div class="field">
+        <label class="section-label" for="end">End</label>
+        <input type="time" id="end" value="20:00">
+      </div>
+    </div>
+
+    <!-- Collapsible Hourly Wage Selector -->
+    <div>
+      <button type="button" class="wage-toggle-btn" id="wageToggleBtn">
+        <span id="wageToggleChevron">▶</span> Hourly wage &amp; currency
+      </button>
+      <div class="wage-panel" id="wagePanel">
+        <div class="wage-row">
+          <span class="symbol" id="currSymbol">€</span>
+          <input type="number" id="wage" value="18.00" min="0" step="0.01" inputmode="decimal">
+          <select id="currency">
+            <option value="€" selected>EUR €</option>
+            <option value="$">USD $</option>
+            <option value="£">GBP £</option>
+            <option value="kr">SEK/NOK kr</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="result">
+      <div class="result-top">
+        <div>
+          <div class="muted">Shift duration</div>
+          <div class="duration" id="duration">12h 00m</div>
+        </div>
+        <div style="text-align:right">
+          <div class="muted">You earn</div>
+          <div class="amount" id="earnings">€216.00</div>
+        </div>
+      </div>
+      <div class="sub" id="nightInfo">Night hours: 0h 00m</div>
+    </div>
+
+    <button class="add-btn" id="addShift">Add shift to calendar</button>
+  </div>
+
+  <!-- Settings Modal -->
+  <div class="modal-overlay" id="settingsModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Pay settings</h2>
+        <button class="modal-close" id="closeSettings">✕</button>
+      </div>
+
+      <div class="settings-section" style="border-bottom:0;padding-bottom:0;">
+        <div class="settings-grid">
+          <label>Night starts<input type="time" id="nightStart" value="22:00"></label>
+          <label>Night ends<input type="time" id="nightEnd" value="06:00"></label>
+          <label>Day multiplier<input type="number" id="dayMult" value="1" min="0" step=".05"></label>
+          <label>Night multiplier<input type="number" id="nightMult" value="1.25" min="0" step=".05"></label>
+          <label>Holiday multiplier<input type="number" id="holidayMult" value="2" min="0" step=".05"></label>
+          <label>Overtime multiplier<input type="number" id="otMult" value="1.5" min="0" step=".05"></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Job Manager Modal -->
+  <div class="modal-overlay" id="jobManagerModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h2>Manage Jobs</h2>
+        <button class="modal-close" id="closeJobManager">✕</button>
+      </div>
+
+      <div style="padding:16px;border-bottom:1px solid var(--border);">
+        <div style="display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:12px;">
+          <input type="text" id="newJobName" placeholder="Job name (e.g., Café, Retail)">
+          <button type="button" class="modal-btn save" id="addJobBtn" style="width:auto;">Add Job</button>
+        </div>
+        <div id="jobsList" style="max-height:300px;overflow-y:auto;"></div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn save" id="closeJobManagerBtn" style="width:100%;">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day Editor Modal -->
+  <div class="modal-overlay" id="dayModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="dayModalTitle">Manage Day</h2>
+        <button class="modal-close" id="closeDayModal">✕</button>
+      </div>
+
+      <div class="modal-actions" style="flex-direction: column; gap: 8px;">
+        <div style="display:grid; grid-template-columns: repeat(2, 1fr); gap:6px;">
+          <button type="button" class="modal-btn add-shift-btn" id="dayModalAddShiftBtn" style="font-size:11px; padding:10px 4px;">Add shift</button>
+          <button type="button" class="modal-btn holiday-toggle" id="dayModalHolidayBtn" style="font-size:11px; padding:10px 4px;">Mark holiday</button>
+        </div>
+        <button type="button" class="modal-btn save" id="dayModalSaveBtn" style="width:100%;">Save changes</button>
+        <button type="button" class="modal-btn delete" id="deleteDayBtn" style="display:none;width:100%;">Remove Day Status</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Shift Modal -->
+  <div class="modal-overlay" id="addShiftModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="addShiftModalTitle">Add Shift</h2>
+        <button class="modal-close" id="closeAddShiftModal">✕</button>
+      </div>
+
+      <div class="field" style="margin-bottom:10px;">
+        <label class="section-label">Templates</label>
+        <div class="templates-bar" id="addShiftModalTemplatesBar">
+          <button type="button" class="add-template-trigger" id="addShiftModalAddTplToggle" title="Add new template">+</button>
+        </div>
+        <div class="add-template-form" id="addShiftModalAddTplForm">
+          <input type="text" id="addShiftModalNewTplName" placeholder="Template name">
+          <input type="time" id="addShiftModalNewTplStart" value="09:00">
+          <input type="time" id="addShiftModalNewTplEnd" value="17:00">
+          <button type="button" class="add-tpl-action-btn" id="addShiftModalAddTplBtn">Save template</button>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label class="section-label" for="addShiftModalStart">Shift Start</label>
+          <input type="time" id="addShiftModalStart" value="08:00">
+        </div>
+        <div class="field">
+          <label class="section-label" for="addShiftModalEnd">Shift End</label>
+          <input type="time" id="addShiftModalEnd" value="20:00">
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn save" id="addShiftModalSaveBtn" style="width:100%;">Save changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Shift Editor Modal -->
+  <div class="modal-overlay" id="shiftModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2 id="shiftModalTitle">Manage Shift</h2>
+        <button class="modal-close" id="closeShiftModal">✕</button>
+      </div>
+      
+      <div class="field" style="margin-bottom:10px;">
+        <label class="section-label">Templates</label>
+        <div class="templates-bar" id="modalTemplatesBar">
+          <button type="button" class="add-template-trigger" id="modalAddTplToggle" title="Add new template">+</button>
+        </div>
+        <div class="add-template-form" id="modalAddTplForm">
+          <input type="text" id="modalNewTplName" placeholder="Template name">
+          <input type="time" id="modalNewTplStart" value="09:00">
+          <input type="time" id="modalNewTplEnd" value="17:00">
+          <button type="button" class="add-tpl-action-btn" id="modalAddTplBtn">Save template</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="section-label" for="editStart">Start Time</label>
+        <input type="time" id="editStart">
+      </div>
+      <div class="field">
+        <label class="section-label" for="editEnd">End Time</label>
+        <input type="time" id="editEnd">
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn delete" id="deleteShiftBtn">Remove Shift</button>
+        <button type="button" class="modal-btn save" id="saveShiftModalBtn">Save Changes</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlap Warning Modal -->
+  <div class="modal-overlay" id="overlapWarningModal">
+    <div class="modal" style="max-width:400px;">
+      <div class="modal-header">
+        <h2>⚠️ Shift Overlap Detected</h2>
+        <button class="modal-close" id="closeOverlapWarning">✕</button>
+      </div>
+
+      <div style="padding:16px;border-bottom:1px solid var(--line);">
+        <p id="overlapMessage" style="margin:0 0 8px 0;color:var(--paper-dim);line-height:1.5;"></p>
+        <p style="margin:0;font-size:12px;color:var(--paper-dim);">You're adding a shift that overlaps with an existing one. Choose an option below:</p>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="modal-btn" id="overlapCancelBtn" style="background:var(--ink);border:1px solid var(--line);color:var(--paper);">Cancel</button>
+        <button type="button" class="modal-btn save" id="overlapOverrideBtn">Add Anyway</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="cal-header">
+      <div class="cal-header-left">
+        <span class="month-label" id="monthLabel"></span>
+        <div class="cal-nav">
+          <button id="prevMonth" aria-label="Previous month">‹</button>
+          <button id="nextMonth" aria-label="Next month">›</button>
+        </div>
+      </div>
+      <div class="monthly-hours-box">
+        <label for="monthlyStandardHours">Standard hours</label>
+        <div class="hours-pill">
+          <button type="button" class="hours-btn" id="hoursDec">−</button>
+          <input type="number" id="monthlyStandardHours" value="160" min="0" step="1">
+          <span>h</span>
+          <button type="button" class="hours-btn" id="hoursInc">+</button>
+        </div>
+      </div>
+    </div>
+    <div class="weekdays"><span>Mo</span><span>Tu</span><span>We</span><span>Th</span><span>Fr</span><span>Sa</span><span>Su</span></div>
+    <div class="grid" id="grid"></div>
+    <button class="export-btn" id="exportIcs">Export month to calendar (.ics)</button>
+  </div>
+
+  <div class="summary">
+    <div class="stat"><span>Shifts</span><b id="shiftCount">0</b></div>
+    <div class="stat"><span>Total hours</span><b id="totalHours">0h</b></div>
+    <div class="stat"><span>Holiday hours</span><b id="holidayHours">0h</b></div>
+    <div class="stat"><span>Overtime hours</span><b id="overtimeHours">0h</b></div>
+    <div class="stat"><span>You can earn</span><b id="totalPay">€0.00</b></div>
+  </div>
+
+  <p class="hint">Enter your shift once and it is immediately calculated. Press "Add shift to calendar" to save it to the selected date.</p>
+</div>
+
+<script src="../js/config.js"></script>
+<script src="../js/utils.js"></script>
+<script src="../js/calculator.js"></script>
+<script src="../js/shifts-utils.js"></script>
+<script src="../js/state.js"></script>
+<script src="../js/templates.js"></script>
+<script src="../js/calendar.js"></script>
+<script src="../js/datepicker.js"></script>
+<script src="../js/modals.js"></script>
+<script src="../js/events.js"></script>
+<script src="../js/main.js"></script>
+</body>
+</html>

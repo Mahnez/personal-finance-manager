@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Pay - Budget Manager</title>
+<link rel="stylesheet" href="../css/budget.css">
+</head>
+<body>
+  <div class="budget-container">
+    <div class="masthead">
+      <div class="masthead-left">
+        <a href="index.html" class="back-btn" title="Back to home">←</a>
+        <h1>Budget Manager</h1>
+      </div>
+      <span id="today"></span>
+    </div>
+
+    <!-- Overview Cards -->
+    <div class="overview-cards">
+      <div class="overview-card income">
+        <span class="card-label">Monthly Income</span>
+        <span class="card-value" id="totalIncome">€0.00</span>
+        <span class="card-sub" id="incomeSource">From shifts</span>
+      </div>
+      <div class="overview-card expenses">
+        <span class="card-label">Total Expenses</span>
+        <span class="card-value" id="totalExpenses">€0.00</span>
+        <span class="card-sub" id="expenseCount">0 expenses</span>
+      </div>
+      <div class="overview-card remaining">
+        <span class="card-label">Remaining</span>
+        <span class="card-value" id="remainingAmount">€0.00</span>
+        <span class="card-sub" id="savingsRate">0% saved</span>
+      </div>
+    </div>
+
+    <!-- Budget Progress -->
+    <div class="budget-progress-section">
+      <div class="progress-header">
+        <h3>Spending Progress</h3>
+        <span id="progressPercentage">0%</span>
+      </div>
+      <div class="progress-bar-container">
+        <div class="progress-bar" id="progressBar"></div>
+      </div>
+      <p class="progress-warning" id="progressWarning"></p>
+    </div>
+
+    <!-- Actions -->
+    <div class="budget-actions">
+      <button class="action-btn primary" id="addExpenseBtn">+ Add Expense</button>
+      <button class="action-btn secondary" id="addIncomeBtn">+ Add Income</button>
+      <button class="action-btn secondary" id="manageCategoriesBtn">Manage Categories</button>
+    </div>
+
+    <!-- Expenses List -->
+    <div class="expenses-section">
+      <h3>Expenses</h3>
+      <div class="expenses-filter">
+        <select id="categoryFilter">
+          <option value="all">All Categories</option>
+        </select>
+        <select id="monthFilter">
+          <option value="current">This Month</option>
+          <option value="last">Last Month</option>
+          <option value="all">All Time</option>
+        </select>
+      </div>
+      <div class="expenses-list" id="expensesList">
+        <p class="empty-state">No expenses recorded yet.</p>
+      </div>
+    </div>
+
+    <!-- Income List -->
+    <div class="income-section">
+      <h3>Income Sources</h3>
+      <div class="income-list" id="incomeList">
+        <p class="empty-state">No income recorded yet. Add income or link shifts.</p>
+      </div>
+    </div>
+
+    <!-- Savings Goals -->
+    <div class="savings-section">
+      <h3>Savings Goals</h3>
+      <div class="savings-list" id="savingsList">
+        <p class="empty-state">No savings goals set.</p>
+      </div>
+      <button class="action-btn secondary" id="addGoalBtn">+ Add Savings Goal</button>
+    </div>
+
+    <!-- Reports -->
+    <div class="reports-section">
+      <h3>Monthly Report</h3>
+      <div class="report-summary" id="reportSummary">
+        <div class="report-item">
+          <span>Total Income</span>
+          <strong id="reportIncome">€0.00</strong>
+        </div>
+        <div class="report-item">
+          <span>Total Expenses</span>
+          <strong id="reportExpenses">€0.00</strong>
+        </div>
+        <div class="report-item">
+          <span>Net Savings</span>
+          <strong id="reportSavings">€0.00</strong>
+        </div>
+        <div class="report-item">
+          <span>Savings Rate</span>
+          <strong id="reportRate">0%</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Expense Modal -->
+  <div class="modal-overlay" id="expenseModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Expense</h2>
+        <button class="modal-close" id="closeExpenseModal">✕</button>
+      </div>
+      <div class="modal-form">
+        <label>Expense Name</label>
+        <input type="text" id="expenseName" placeholder="e.g., Rent, Food, Transport">
+        
+        <label>Amount</label>
+        <input type="number" id="expenseAmount" placeholder="0.00" min="0" step="0.01">
+        
+        <label>Category</label>
+        <select id="expenseCategory">
+          <option value="housing">Housing</option>
+          <option value="food">Food</option>
+          <option value="transport">Transport</option>
+          <option value="utilities">Utilities</option>
+          <option value="entertainment">Entertainment</option>
+          <option value="health">Health</option>
+          <option value="other">Other</option>
+        </select>
+        
+        <label>Date</label>
+        <input type="date" id="expenseDate">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn save" id="saveExpenseBtn">Save Expense</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Income Modal -->
+  <div class="modal-overlay" id="incomeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Income</h2>
+        <button class="modal-close" id="closeIncomeModal">✕</button>
+      </div>
+      <div class="modal-form">
+        <label>Income Source</label>
+        <input type="text" id="incomeName" placeholder="e.g., Bonus, Side Job">
+        
+        <label>Amount</label>
+        <input type="number" id="incomeAmount" placeholder="0.00" min="0" step="0.01">
+        
+        <label>Date</label>
+        <input type="date" id="incomeDate">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn save" id="saveIncomeBtn">Save Income</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Goal Modal -->
+  <div class="modal-overlay" id="goalModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Add Savings Goal</h2>
+        <button class="modal-close" id="closeGoalModal">✕</button>
+      </div>
+      <div class="modal-form">
+        <label>Goal Name</label>
+        <input type="text" id="goalName" placeholder="e.g., Emergency Fund">
+        
+        <label>Target Amount</label>
+        <input type="number" id="goalAmount" placeholder="0.00" min="0" step="0.01">
+        
+        <label>Target Date</label>
+        <input type="date" id="goalDate">
+      </div>
+      <div class="modal-actions">
+        <button class="modal-btn save" id="saveGoalBtn">Save Goal</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="../js/budget.js"></script>
+</body>
+</html>

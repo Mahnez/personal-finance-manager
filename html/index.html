@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shift Pay - Home</title>
+<link rel="stylesheet" href="../css/landing.css">
+</head>
+<body>
+  <div class="landing-container">
+    <div class="landing-header">
+      <div class="logo">
+        <span class="logo-icon">⏱</span>
+        <h1>Shift Pay</h1>
+      </div>
+      <p class="tagline">Track your shifts, calculate your earnings, manage your budget</p>
+    </div>
+
+    <div class="main-actions">
+      <a href="shift-planner.html" class="primary-btn">
+        <span class="btn-icon">📊</span>
+        <span class="btn-text">
+          <strong>Shift Planner</strong>
+          <small>Calculate pay, manage shifts, export calendar</small>
+        </span>
+        <span class="btn-arrow">→</span>
+      </a>
+      
+      <div class="secondary-actions">
+        <a href="budget.html" class="secondary-btn">
+          <span class="btn-icon">💰</span>
+          <span class="btn-text">
+            <strong>Budget Manager</strong>
+            <small>Track expenses and savings</small>
+          </span>
+        </a>
+        
+        <button class="secondary-btn" id="exportBtn">
+          <span class="btn-icon">📤</span>
+          <span class="btn-text">
+            <strong>Export Data</strong>
+            <small>Download your shift history</small>
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="stats-preview" id="statsPreview">
+      <div class="stat-card">
+        <span class="stat-label">This Month</span>
+        <span class="stat-value" id="previewShifts">0</span>
+        <span class="stat-unit">shifts</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Hours</span>
+        <span class="stat-value" id="previewHours">0h</span>
+        <span class="stat-unit">worked</span>
+      </div>
+      <div class="stat-card">
+        <span class="stat-label">Earnings</span>
+        <span class="stat-value" id="previewEarnings">€0.00</span>
+        <span class="stat-unit">estimated</span>
+      </div>
+    </div>
+
+    <div class="recent-shifts" id="recentShifts">
+      <h3>Recent Shifts</h3>
+      <div id="recentShiftsList">
+        <p class="empty-state">No shifts recorded yet. Start by opening the planner.</p>
+      </div>
+    </div>
+
+    <footer class="landing-footer">
+      <p>Data stored locally on your device</p>
+    </footer>
+  </div>
+
+  <script src="../js/landing.js"></script>
+</body>
+</html>
